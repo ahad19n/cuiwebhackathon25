@@ -18,7 +18,11 @@ export const fetchWeatherData = createAsyncThunk(
   "farmer/fetchWeatherData",
   async (_, { rejectWithValue }) => {
     try {
-      const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY || "demo_key";
+      const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
+      if (!API_KEY) {
+        return rejectWithValue("OpenWeather API key is not configured");
+      }
+
       const weatherPromises = CITIES.map(async (city) => {
         const response = await axios.get(
           `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&units=metric&appid=${API_KEY}`
