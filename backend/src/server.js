@@ -7,6 +7,7 @@ const { resp, graceful, genSecret } = require('./helpers');
 
 const authRoutes = require("./routes/Auth");
 const ratesRoutes = require("./routes/Rates");
+const forumRoutes = require("./routes/Forum");
 
 // -------------------------------------------------------------------------- //
 
@@ -32,6 +33,7 @@ app.get('/', (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/rates", ratesRoutes);
+app.use("/api/forum", forumRoutes);
 
 app.use((req, res) => {
   resp(res, 404, "Route not found");
