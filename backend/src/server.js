@@ -8,15 +8,13 @@ const { resp, graceful, genSecret } = require('./helpers');
 const authRoutes = require("./routes/Auth");
 const ratesRoutes = require("./routes/Rates");
 const forumRoutes = require("./routes/Forum");
+const adviseRoutes = require("./routes/Advise");
 
 // -------------------------------------------------------------------------- //
 
 const app = express();
-app.use(cors({
-  origin: "http://localhost:5173", // 👈 explicit origin instead of "*"
-  credentials: true,               // 👈 allow cookies / Authorization headers
-}));
 app.use(express.json());
+app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 
 if (!process.env.JWT_SECRET)
   process.env.JWT_SECRET = genSecret(32);
@@ -34,6 +32,7 @@ app.get('/', (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/rates", ratesRoutes);
 app.use("/api/forum", forumRoutes);
+app.use("/api/advise", adviseRoutes);
 
 app.use((req, res) => {
   resp(res, 404, "Route not found");
