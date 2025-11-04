@@ -1,4 +1,45 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+
+// Pakistani cities coordinates for weather API
+const CITIES = [
+  { name: "Karachi", lat: 24.8607, lon: 67.0011 },
+  { name: "Lahore", lat: 31.5204, lon: 74.3587 },
+  { name: "Islamabad", lat: 33.6844, lon: 73.0479 },
+  { name: "Faisalabad", lat: 31.4504, lon: 73.135 },
+  { name: "Multan", lat: 30.1575, lon: 71.5249 },
+  { name: "Peshawar", lat: 34.0151, lon: 71.5249 },
+  { name: "Quetta", lat: 30.1798, lon: 66.975 },
+  { name: "Sialkot", lat: 32.4945, lon: 74.5229 },
+];
+
+// Async thunk to fetch weather data
+export const fetchWeatherData = createAsyncThunk(
+  "farmer/fetchWeatherData",
+  async (_, { rejectWithValue }) => {
+    try {
+      const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY || "demo_key";
+      const weatherPromises = CITIES.map(async (city) => {
+        const response = await axios.get(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&units=metric&appid=${API_KEY}`
+        );
+        return {
+          name: city.name,
+          temp: Math.round(response.data.main.temp),
+          condition: response.data.weather[0].main,
+          humidity: response.data.main.humidity,
+        };
+      });
+
+      const weatherData = await Promise.all(weatherPromises);
+      return weatherData;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch weather data"
+      );
+    }
+  }
+);
 
 const initialState = {
   currentTab: "marketPrices",
@@ -9,16 +50,9 @@ const initialState = {
     items: [],
   },
   weather: {
-    cities: [
-      { name: "Karachi", temp: 32, condition: "Sunny", humidity: 65 },
-      { name: "Lahore", temp: 28, condition: "Partly Cloudy", humidity: 55 },
-      { name: "Islamabad", temp: 25, condition: "Rainy", humidity: 70 },
-      { name: "Faisalabad", temp: 35, condition: "Hot", humidity: 40 },
-      { name: "Multan", temp: 36, condition: "Hot", humidity: 38 },
-      { name: "Peshawar", temp: 27, condition: "Normal", humidity: 60 },
-      { name: "Quetta", temp: 22, condition: "Cool", humidity: 45 },
-      { name: "Sialkot", temp: 26, condition: "Rainy", humidity: 75 },
-    ],
+    cities: [],
+    loading: false,
+    error: null,
   },
   smartAdvice: {
     tips: [
@@ -87,6 +121,21 @@ const farmerSlice = createSlice({
     addCommunityPost(state, action) {
       state.community.posts.unshift(action.payload);
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchWeatherData.pending, (state) => {
+        state.weather.loading = true;
+        state.weather.error = null;
+      })
+      .addCase(fetchWeatherData.fulfilled, (state, action) => {
+        state.weather.loading = false;
+        state.weather.cities = action.payload;
+      })
+      .addCase(fetchWeatherData.rejected, (state, action) => {
+        state.weather.loading = false;
+        state.weather.error = action.payload;
+      });
   },
 });
 

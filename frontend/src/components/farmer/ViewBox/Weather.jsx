@@ -1,6 +1,7 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import { Cloud, CloudRain, Sun } from "lucide-react";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Cloud, CloudRain, Sun, Loader2 } from "lucide-react";
+import { fetchWeatherData } from "../../../redux/Slices/FarmerSlice";
 
 const getWeatherIcon = (condition) => {
   const lowerCondition = condition.toLowerCase();
@@ -21,7 +22,47 @@ const getWeatherColor = (condition) => {
 };
 
 const Weather = () => {
-  const cities = useSelector((state) => state.farmer.weather.cities);
+  const { cities, loading, error } = useSelector(
+    (state) => state.farmer.weather
+  );
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchWeatherData());
+  }, [dispatch]);
+
+  if (loading) {
+    return (
+      <section className="rounded-3xl bg-white p-6 shadow-lg ring-1 ring-emerald-200 backdrop-blur md:p-8">
+        <div className="flex flex-col items-center justify-center py-12">
+          <Loader2 className="h-12 w-12 text-emerald-600 animate-spin mb-4" />
+          <p className="text-slate-600 font-medium">Loading weather data...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="rounded-3xl bg-white p-6 shadow-lg ring-1 ring-red-200 backdrop-blur md:p-8">
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="rounded-full bg-red-100 p-3 mb-4">
+            <Cloud className="h-8 w-8 text-red-600" />
+          </div>
+          <p className="text-red-600 font-semibold mb-2">
+            Failed to load weather data
+          </p>
+          <p className="text-slate-500 text-sm">{error}</p>
+          <button
+            onClick={() => dispatch(fetchWeatherData())}
+            className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="rounded-3xl bg-white p-6 shadow-lg ring-1 ring-emerald-200 backdrop-blur md:p-8">
