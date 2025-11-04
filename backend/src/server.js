@@ -1,6 +1,6 @@
+const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors"); // ✅ Import CORS
 
 const handlerError = require("./middlewares/HandlerError");
 const { resp, graceful, genSecret } = require('./helpers');
@@ -12,13 +12,7 @@ const ratesRoutes = require("./routes/Rates");
 
 const app = express();
 app.use(express.json());
-
-// ✅ Enable CORS for all origins
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+app.use(cors({ origin: "*" }));
 
 if (!process.env.JWT_SECRET)
   process.env.JWT_SECRET = genSecret(32);
