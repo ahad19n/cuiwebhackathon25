@@ -1,4 +1,4 @@
-const resp = require("../helpers/resp.helper");
+const { resp } = require("../helpers");
 
 module.exports = (err, req, res, next) => {
   console.error("[ERROR]:", err);

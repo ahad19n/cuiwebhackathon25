@@ -1,11 +1,11 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const User = require("../models/User");
 const { resp } = require("../helpers");
-const User = require("../models/User.model");
-const asyncHandler = require("../middleware/AsyncHandler.middleware");
+const handlerAsync = require("../middlewares/HandlerAsync");
 
-exports.register = asyncHandler(async (req, res) => {
+exports.register = handlerAsync(async (req, res) => {
   const { name, email, password, role } = req.body;
 
   if (!name || !email || !password || !role)
@@ -25,7 +25,7 @@ exports.register = asyncHandler(async (req, res) => {
   resp(res, 201, "User registered successfully");
 });
 
-exports.login = asyncHandler(async (req, res) => {
+exports.login = handlerAsync(async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password)
@@ -39,19 +39,12 @@ exports.login = asyncHandler(async (req, res) => {
   if (!await bcrypt.compare(password, user.password))
     return resp(res, 400, "Invalid credentials");
 
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
-
   resp(res, 200, "Login successful", {
-    token,
-    user: {
+    token: jwt.sign({
       id: user._id,
       name: user.name,
-      email: user.email,
       role: user.role
-    }
+    },
+    process.env.JWT_SECRET, { expiresIn: "7d" })
   });
 });
