@@ -3,11 +3,12 @@ import { useForm } from "react-hook-form";
 import { Info, Sprout, BarChart2, CloudSun, MessageCircle } from "lucide-react";
 import api from "../api/api";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 function Auth() {
   const [tab, setTab] = useState("signin");
-
   const navigate = useNavigate();
+  const { signIn } = useAuth();
 
   // React Hook Form for Sign In
   const {
@@ -31,11 +32,28 @@ function Auth() {
       // Fix: Check status as a property, not a function
       if (res.status === 201 || res.status === 200) {
         alert("Login Successful!");
-        if(res.data.role === "Admin"){
+
+        // Store token and user info in context and localStorage
+        const { token } = res.data.data;
+
+        // Decode the token to get user ID
+        const tokenPayload = JSON.parse(atob(token.split(".")[1]));
+
+        const userData = {
+          id: tokenPayload.id,
+          name: tokenPayload.name,
+          role: tokenPayload.role,
+        };
+
+        signIn(userData, token);
+
+        // Check the role from the decoded token, not res.data.role
+        if (tokenPayload.role === "admin") {
+          console.log("Admin logged in");
           navigate("/admin");
-        }else{
+        } else {
           // this takes us to the farmer's dashboard
-          navigate("/");
+          navigate("/farmer");
         }
       }
     } catch (error) {

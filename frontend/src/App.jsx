@@ -8,8 +8,8 @@ function App() {
     <>
       <Navbar />
       <Routes>
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/" element={<FarmerDashboard />} />
+        <Route path="/" element={<Auth />} />
+        <Route path="/farmer" element={<FarmerDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </>

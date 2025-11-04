@@ -18,8 +18,10 @@ exports.register = handlerAsync(async (req, res) => {
     return resp(res, 400, "Email already registered");
 
   await new User({
-    name, email, role,
-    password: await bcrypt.hash(password, 10)
+    name,
+    email,
+    role,
+    password: await bcrypt.hash(password, 10),
   }).save();
 
   resp(res, 201, "User registered successfully");
@@ -28,23 +30,30 @@ exports.register = handlerAsync(async (req, res) => {
 exports.login = handlerAsync(async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password)
-    return resp(res, 400, "Email and password required");
+  if (!email || !password) return resp(res, 400, "Email and password required");
 
   const user = await User.findOne({ email });
 
-  if (!user)
-    return resp(res, 400, "Invalid credentials");
+  if (!user) return resp(res, 400, "Invalid credentials");
 
-  if (!await bcrypt.compare(password, user.password))
+  if (!(await bcrypt.compare(password, user.password)))
     return resp(res, 400, "Invalid credentials");
 
   resp(res, 200, "Login successful", {
-    token: jwt.sign({
-      id: user._id,
-      name: user.name,
-      role: user.role
-    },
-    process.env.JWT_SECRET, { expiresIn: "7d" })
+    token: jwt.sign(
+      {
+        id: user._id,
+        name: user.name,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    ),
   });
+});
+
+exports.logout = handlerAsync(async (req, res) => {
+  // The logout is mainly handled on the frontend by removing the token
+  // This endpoint can be used for additional backend cleanup if needed
+  resp(res, 200, "Logout successful");
 });

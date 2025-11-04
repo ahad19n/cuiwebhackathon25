@@ -10,16 +10,18 @@ exports.getRates = handlerAsync(async (req, res) => {
 exports.addRate = handlerAsync(async (req, res) => {
   const { name, rate } = req.body;
 
-  if (!name || rate == null)
-    return resp(res, 400, "All fields are required");
+  const normalizedName = typeof name === "string" ? name.trim() : "";
+  const numericRate = Number(rate);
 
-  let veg = await Rates.findOne({ name });
+  if (!normalizedName || Number.isNaN(numericRate))
+    return resp(res, 400, "Name and a numeric rate are required");
+
+  let veg = await Rates.findOne({ name: normalizedName });
 
   if (!veg)
-    veg = new Rates({ name, rates: [{ rate }] });
-  
+    veg = new Rates({ name: normalizedName, rates: [{ rate: numericRate }] });
   else {
-    veg.rates.push({ rate });
+    veg.rates.push({ rate: numericRate });
     if (veg.rates.length > 7) veg.rates = veg.rates.slice(-7);
   }
 
@@ -31,8 +33,7 @@ exports.editRate = handlerAsync(async (req, res) => {
   const { id, rateId } = req.params;
   const { rate } = req.body;
 
-  if (rate == null)
-    return resp(res, 400, "Rate is required");
+  if (rate == null) return resp(res, 400, "Rate is required");
 
   const veg = await Rates.findById(id);
   if (!veg) return resp(res, 404, "Vegetable not found");

@@ -1,19 +1,39 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 
 const Navbar = ({ onSignOut, userName = "Farmer User", role = "FARMER" }) => {
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { signOut, user } = useAuth();
 
-  function handleSignOut() {
-    if (typeof onSignOut === "function") return onSignOut();
+  // Use user info from context if available
+  const displayName = user?.name || userName;
+  const displayRole = user?.role?.toUpperCase() || role;
+
+  async function handleSignOut() {
+    setIsLoading(true);
     try {
-      localStorage.removeItem("token");
-    } catch {
-      /* ignore */
+      // Clear auth context and localStorage
+      signOut();
+
+      // Execute custom onSignOut if provided
+      if (typeof onSignOut === "function") {
+        onSignOut();
+      }
+
+      // Navigate to home
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Sign out error:", error);
+      // Still sign out locally even if something fails
+      signOut();
+      navigate("/", { replace: true });
+    } finally {
+      setIsLoading(false);
+      setOpen(false);
     }
-    // Use React Router navigation instead of window.location.href
-    navigate("/");
   }
 
   return (
@@ -47,9 +67,9 @@ const Navbar = ({ onSignOut, userName = "Farmer User", role = "FARMER" }) => {
             </div>
             <div className="text-sm text-gray-500 mt-1 hidden md:flex items-center gap-2">
               Welcome,{" "}
-              <span className="font-medium text-gray-900">{userName}</span>
+              <span className="font-medium text-gray-900">{displayName}</span>
               <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold ml-2">
-                {role}
+                {displayRole}
               </span>
             </div>
           </div>
@@ -59,10 +79,11 @@ const Navbar = ({ onSignOut, userName = "Farmer User", role = "FARMER" }) => {
       <div className="flex items-center gap-2">
         <button
           onClick={handleSignOut}
+          disabled={isLoading}
           aria-label="Sign out"
-          className="hidden md:inline-flex items-center gap-2 border rounded-md px-3 py-2 bg-white text-gray-800 font-semibold"
+          className="hidden md:inline-flex items-center gap-2 border rounded-md px-3 py-2 bg-white text-gray-800 font-semibold hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span>Sign Out</span>
+          <span>{isLoading ? "Signing Out..." : "Sign Out"}</span>
           <svg
             className="ml-1"
             width="16"
@@ -128,18 +149,19 @@ const Navbar = ({ onSignOut, userName = "Farmer User", role = "FARMER" }) => {
               Smart Agriculture Market Tracker
             </div>
             <div className="text-sm text-gray-500 mt-1">
-              Welcome, {userName}{" "}
+              Welcome, {displayName}{" "}
               <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold ml-2">
-                {role}
+                {displayRole}
               </span>
             </div>
           </div>
           <div className="flex justify-end">
             <button
               onClick={handleSignOut}
-              className="w-full md:w-auto px-3 py-2 bg-white border rounded-md text-gray-800 font-semibold"
+              disabled={isLoading}
+              className="w-full md:w-auto px-3 py-2 bg-white border rounded-md text-gray-800 font-semibold hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign Out
+              {isLoading ? "Signing Out..." : "Sign Out"}
             </button>
           </div>
         </div>

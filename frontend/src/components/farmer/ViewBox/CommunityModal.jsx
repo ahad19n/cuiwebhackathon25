@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   toggleCommunityModal,
-  addCommunityPost,
+  createForumPost,
 } from "../../../redux/Slices/FarmerSlice";
 
 const CommunityModal = ({ open }) => {
   const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.farmer.community);
+  const [submitError, setSubmitError] = useState(null);
   const {
     register,
     handleSubmit,
@@ -17,20 +19,28 @@ const CommunityModal = ({ open }) => {
 
   if (!open) return null;
 
-  const onSubmit = (data) => {
-    const newPost = {
-      id: Date.now(),
-      title: data.title,
-      content: data.content,
-      timestamp: new Date().toISOString(),
-    };
-    dispatch(addCommunityPost(newPost));
-    reset();
-    dispatch(toggleCommunityModal());
+  const onSubmit = async (data) => {
+    try {
+      setSubmitError(null);
+      const result = await dispatch(
+        createForumPost({
+          title: data.title,
+          content: data.content,
+        })
+      ).unwrap();
+
+      if (result) {
+        reset();
+        dispatch(toggleCommunityModal());
+      }
+    } catch (error) {
+      setSubmitError(error || "Failed to create post. Please try again.");
+    }
   };
 
   const handleClose = () => {
     reset();
+    setSubmitError(null);
     dispatch(toggleCommunityModal());
   };
 
@@ -108,14 +118,16 @@ const CommunityModal = ({ open }) => {
               type="button"
               onClick={handleClose}
               className="px-6 py-2 rounded-lg border bg-white text-gray-700 hover:bg-gray-50"
+              disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 rounded-lg bg-black text-white hover:bg-gray-900"
+              disabled={loading}
+              className="px-6 py-2 rounded-lg bg-black text-white hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Post
+              {loading ? "Posting..." : "Post"}
             </button>
           </div>
         </form>
