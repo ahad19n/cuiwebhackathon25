@@ -1,9 +1,9 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import MarketPrices from "./ViewBox/MarketPrices";
-import Weather from "./ViewBox/Weather";
-import SmartAdvice from "./ViewBox/SmartAdvice";
-import Community from "./ViewBox/Community";
+import MarketPrices from "./MarketPrices";
+import Weather from "./Weather";
+import SmartAdvice from "./SmartAdvice";
+import Community from "./Community";
 
 const ViewBox = () => {
   const currentTab = useSelector((state) => state.farmer.currentTab);
