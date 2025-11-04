@@ -11,8 +11,8 @@ const ratesRoutes = require("./routes/Rates");
 // -------------------------------------------------------------------------- //
 
 const app = express();
+app.use(cors());
 app.use(express.json());
-app.use(cors({ origin: "*" }));
 
 if (!process.env.JWT_SECRET)
   process.env.JWT_SECRET = genSecret(32);
