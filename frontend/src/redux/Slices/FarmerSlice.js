@@ -21,13 +21,14 @@ export const fetchWeatherData = createAsyncThunk(
       const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY || "demo_key";
       const weatherPromises = CITIES.map(async (city) => {
         const response = await axios.get(
+          `https://api.weatherapi.com/v1/current.json?key=e6b551ac46de4811af491250250411&q=${city.lat},${city.lon}`
           `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&units=metric&appid=${API_KEY}`
         );
         return {
-          name: city.name,
-          temp: Math.round(response.data.main.temp),
-          condition: response.data.weather[0].main,
-          humidity: response.data.main.humidity,
+          name: response.data.location.name,
+          temp: response.data.current.temp_c,
+          condition: response.data.condition.text,
+          humidity: response.data.humidity,
         };
       });
 
