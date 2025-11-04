@@ -1,9 +1,10 @@
 import FarmerDashboard from "./components/farmer/FarmerDashboard";
-import "./App.css";
+import Navbar from "./components/global/Navbar";
 
 function App() {
   return (
     <>
+      <Navbar />
       <FarmerDashboard />
     </>
   );
