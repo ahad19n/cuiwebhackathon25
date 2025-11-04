@@ -18,7 +18,7 @@ const Navbar = ({ onSignOut, userName = "Farmer User", role = "FARMER" }) => {
     <header className="flex items-center justify-between px-4 py-3 border-b bg-white sticky top-0 z-50">
       <div className="flex items-center">
         <div className="flex items-center gap-3">
-          <div className="flex-shrink-0" aria-hidden>
+          <div className="shrink-0" aria-hidden>
             {/* simple plant icon in green circle */}
             <svg
               width="40"
