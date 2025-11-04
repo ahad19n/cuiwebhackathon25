@@ -1,59 +1,62 @@
-const Rate = require("../models/Rates");
+const { resp } = require("../helpers");
+const Rates = require("../models/Rates");
 const handlerAsync = require("../middlewares/HandlerAsync");
 
 exports.getRates = handlerAsync(async (req, res) => {
-    const since = new Date();
-    since.setDate(since.getDate() - 7);
-
-    const rates = await Rate.find({ date: { $gte: since } }).sort({ date: -1 });
-    res.json(rates);
-  } catch (err) {
-    next(err);
-  }
+  const rates = await Rates.find().lean();
+  resp(res, 200, "Fetched all rates", { rates });
 });
 
-// ✅ POST add new rate
-exports.addRate = async (req, res, next) => {
-  try {
-    const { vegetableSlug, vegetableName, rate } = req.body;
-    if (!vegetableSlug || !vegetableName || rate == null)
-      return res.status(400).json({ message: "All fields are required" });
+exports.addRate = handlerAsync(async (req, res) => {
+  const { name, rate } = req.body;
 
-    const newRate = new Rate({ vegetableSlug, vegetableName, rate });
-    await newRate.save();
+  if (!name || rate == null)
+    return resp(res, 400, "All fields are required");
 
-    res.status(201).json({ message: "Rate added successfully", rate: newRate });
-  } catch (err) {
-    next(err);
+  let veg = await Rates.findOne({ name });
+
+  if (!veg)
+    veg = new Rates({ name, rates: [{ rate }] });
+  
+  else {
+    veg.rates.push({ rate });
+    if (veg.rates.length > 7) veg.rates = veg.rates.slice(-7);
   }
-};
 
-// ✅ PATCH edit rate
-exports.editRate = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const updates = req.body;
+  await veg.save();
+  resp(res, 201, "Rate added", { vegetable: veg });
+});
 
-    const updatedRate = await Rate.findByIdAndUpdate(id, updates, { new: true });
-    if (!updatedRate)
-      return res.status(404).json({ message: "Rate not found" });
+exports.editRate = handlerAsync(async (req, res) => {
+  const { id, rateId } = req.params;
+  const { rate } = req.body;
 
-    res.json({ message: "Rate updated", rate: updatedRate });
-  } catch (err) {
-    next(err);
-  }
-};
+  if (rate == null)
+    return resp(res, 400, "Rate is required");
 
-// ✅ DELETE rate
-exports.deleteRate = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const deleted = await Rate.findByIdAndDelete(id);
-    if (!deleted)
-      return res.status(404).json({ message: "Rate not found" });
+  const veg = await Rates.findById(id);
+  if (!veg) return resp(res, 404, "Vegetable not found");
 
-    res.json({ message: "Rate deleted successfully" });
-  } catch (err) {
-    next(err);
-  }
-};
+  const rateEntry = veg.rates.id(rateId);
+  if (!rateEntry) return resp(res, 404, "Rate not found");
+
+  rateEntry.rate = rate;
+  await veg.save();
+
+  resp(res, 200, "Rate updated", { vegetable: veg });
+});
+
+exports.deleteRate = handlerAsync(async (req, res) => {
+  const { id, rateId } = req.params;
+
+  const veg = await Rates.findById(id);
+  if (!veg) return resp(res, 404, "Vegetable not found");
+
+  const rateEntry = veg.rates.id(rateId);
+  if (!rateEntry) return resp(res, 404, "Rate not found");
+
+  rateEntry.deleteOne();
+  await veg.save();
+
+  resp(res, 200, "Rate deleted", { vegetable: veg });
+});
