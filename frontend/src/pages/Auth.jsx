@@ -2,9 +2,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Info, Sprout, BarChart2, CloudSun, MessageCircle } from "lucide-react";
 import api from "../api/api";
+import { useNavigate } from "react-router-dom";
 
 function Auth() {
   const [tab, setTab] = useState("signin");
+
+  const navigate = useNavigate();
 
   // React Hook Form for Sign In
   const {
@@ -20,18 +23,47 @@ function Auth() {
     formState: { errors: errorsSignUp },
   } = useForm();
 
-  const onSignInSubmit = async (data) => {
-    console.log("Sign In Data:", data);
-    // TODO: Call your sign-in API or authentication logic here
-    const res = await api.login(payload);
+  const onSignInSubmit = async (payload) => {
+    console.log("Sign In Data:", payload);
+    try {
+      const res = await api.signIn(payload);
+
+      // Fix: Check status as a property, not a function
+      if (res.status === 201 || res.status === 200) {
+        alert("Login Successful!");
+        if(res.data.role === "Admin"){
+          navigate("/admin");
+        }else{
+          // this takes us to the farmer's dashboard
+          navigate("/");
+        }
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Login failed. Please check your credentials.");
+    }
   };
 
-  const onSignUpSubmit = async (data) => {
-    console.log("Sign Up Data:", data);
-    // Transform role to lowercase before sending to backend
-    const transformedData = { ...data, role: data.role.toLowerCase() };
-    const res = await api.signUp(transformedData);
-    console.log("Sign Up Response:", res);
+  const onSignUpSubmit = async (payload) => {
+    console.log("Sign Up Data:", payload);
+    try {
+      // Transform role to lowercase before sending to backend
+      const transformedPayload = {
+        ...payload,
+        role: payload.role.toLowerCase(),
+      };
+      const res = await api.signUp(transformedPayload);
+      console.log("Sign Up Response:", res);
+
+      // Fix: Check status as a property, not a function
+      if (res.status === 201 || res.status === 200) {
+        alert("Account Created Successfully! Please Sign In.");
+        setTab("signin");
+      }
+    } catch (error) {
+      console.error("Sign up error:", error);
+      alert("Sign up failed. Please try again.");
+    }
   };
 
   return (

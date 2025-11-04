@@ -11,7 +11,7 @@ api.signUp = (payload) => {
   return api.post("/auth/register", payload);
 };
 
-api.SignIn = (payload) => {
+api.signIn = (payload) => {
   return api.post("/auth/login", payload);
 };
 

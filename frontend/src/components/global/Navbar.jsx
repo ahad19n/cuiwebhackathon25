@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ onSignOut, userName = "Farmer User", role = "FARMER" }) => {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   function handleSignOut() {
     if (typeof onSignOut === "function") return onSignOut();
@@ -10,8 +12,8 @@ const Navbar = ({ onSignOut, userName = "Farmer User", role = "FARMER" }) => {
     } catch {
       /* ignore */
     }
-    // safe default: navigate to root (app should handle routing to auth if needed)
-    window.location.href = "/";
+    // Use React Router navigation instead of window.location.href
+    navigate("/");
   }
 
   return (
