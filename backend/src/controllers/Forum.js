@@ -27,7 +27,7 @@ exports.updatePost = handlerAsync(async (req, res) => {
   if (!post) return resp(res, 404, "Post not found");
 
   // Optional: restrict edit to author or admin
-  if (post.author.toString() !== req.token.id.toString())
+  if (post.author.toString() !== req.user._id.toString() && req.user.role !== "admin")
     return resp(res, 403, "Unauthorized");
 
   if (title) post.title = title;
@@ -42,7 +42,7 @@ exports.deletePost = handlerAsync(async (req, res) => {
   const post = await Post.findById(id);
   if (!post) return resp(res, 404, "Post not found");
 
-  if (post.author.toString() !== req.token.id.toString())
+  if (post.author.toString() !== req.user._id.toString() && req.user.role !== "admin")
     return resp(res, 403, "Unauthorized");
 
   await post.deleteOne();
