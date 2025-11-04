@@ -1,8 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const { resp } = require("../helpers");
 const User = require("../models/User.model");
-const resp = require("../helpers/resp.helper");
 const asyncHandler = require("../middleware/AsyncHandler.middleware");
 
 exports.register = asyncHandler(async (req, res) => {
@@ -25,39 +25,33 @@ exports.register = asyncHandler(async (req, res) => {
   resp(res, 201, "User registered successfully");
 });
 
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+exports.login = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-    if (!email || !password)
-      return res.status(400).json({ message: "Email and password required" });
+  if (!email || !password)
+    return resp(res, 400, "Email and password required");
 
-    const user = await User.findOne({ email });
-    if (!user)
-      return res.status(400).json({ message: "Invalid credentials" });
+  const user = await User.findOne({ email });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Invalid credentials" });
+  if (!user)
+    return resp(res, 400, "Invalid credentials");
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+  if (!await bcrypt.compare(password, user.password))
+    return resp(res, 400, "Invalid credentials");
 
-    res.status(200).json({
-      message: "Login successful",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  const token = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  resp(res, 200, "Login successful", {
+    token,
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    }
+  });
+});
