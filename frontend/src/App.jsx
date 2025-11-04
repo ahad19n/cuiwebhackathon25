@@ -1,16 +1,13 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import FarmerDashboard from "./components/farmer/FarmerDashboard";
+import Navbar from "./components/global/Navbar";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-     
+      <Navbar />
+      <FarmerDashboard />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
