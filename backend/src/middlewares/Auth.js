@@ -1,29 +1,25 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const { resp } = require("../helpers");
+ 
+module.exports = (options = {}) => {
+  return (req, res, next) => {
+    const authHeader = req.get('Authorization');
+    const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
-module.exports = (allowedRoles = []) => {
-  return async (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return resp(res, 401, "No token provided");
+    if (!token) return resp(res, 401, 'Missing auth token');
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      if (options.type && decoded.type !== options.type) {
+        return resp(res, 403, 'Invalid token type');
+      }
+
+      req.token = decoded;
+      next();
     }
-
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      
-    req.user = decoded;
-    const user = await User.findById(decoded.id);
-
-    if (!user) {
-      return resp(res, 401, "Invalid or expired token");
+            
+    catch (error) {
+      return resp(res, 401, 'Invalid or expired auth token');
     }
-
-    if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-      return resp(res, 401, "Invalid or expired token");
-    }
-
-    req.user = user;
-
-    next();
   }
-};
+}
