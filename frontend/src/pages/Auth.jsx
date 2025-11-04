@@ -26,7 +26,7 @@ function Auth() {
   const onSignInSubmit = async (payload) => {
     console.log("Sign In Data:", payload);
     try {
-      const res = await api.login(payload);
+      const res = await api.signIn(payload);
 
       // Fix: Check status as a property, not a function
       if (res.status === 201 || res.status === 200) {
