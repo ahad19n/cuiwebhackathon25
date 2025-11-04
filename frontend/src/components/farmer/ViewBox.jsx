@@ -32,7 +32,7 @@ const ViewBox = () => {
       </header>
 
       <form className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-[1.2fr_repeat(2,1fr)]">
-        <label className="flex items-center gap-3 rounded-2xl bg-emerald-50/70 px-4 py-3 text-slate-500 shadow-sm focus-within:ring-2 focus-within:ring-emerald-400">
+        <label className="flex items-center gap-3 rounded-2xl bg-emerald-50 px-4 py-3 text-slate-500 shadow-sm focus-within:ring-2 focus-within:ring-emerald-400">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -54,7 +54,7 @@ const ViewBox = () => {
           />
         </label>
 
-        <label className="relative flex items-center gap-3 rounded-2xl bg-emerald-50/70 px-4 py-3 text-sm text-slate-600 shadow-sm focus-within:ring-2 focus-within:ring-emerald-400">
+        <label className="relative flex items-center gap-3 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-slate-600 shadow-sm focus-within:ring-2 focus-within:ring-emerald-400">
           <span className="font-medium">Region</span>
           <select
             className="w-full bg-transparent text-right text-slate-700 focus:outline-none"
@@ -65,10 +65,18 @@ const ViewBox = () => {
               <option key={region}>{region}</option>
             ))}
           </select>
-          <span className="pointer-events-none absolute right-4 text-base text-emerald-500">▾</span>
+          <svg
+            className="pointer-events-none absolute right-4 h-4 w-4 text-emerald-500"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden
+          >
+            <path d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.585l3.71-3.354a.75.75 0 1 1 1.02 1.1l-4.22 3.82a.75.75 0 0 1-1.02 0l-4.22-3.82a.75.75 0 0 1 .02-1.1Z" />
+          </svg>
         </label>
 
-        <label className="relative flex items-center gap-3 rounded-2xl bg-emerald-50/70 px-4 py-3 text-sm text-slate-600 shadow-sm focus-within:ring-2 focus-within:ring-emerald-400 sm:col-span-2 lg:col-span-1">
+        <label className="relative flex items-center gap-3 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-slate-600 shadow-sm focus-within:ring-2 focus-within:ring-emerald-400 sm:col-span-2 lg:col-span-1">
           <span className="font-medium">Category</span>
           <select
             className="w-full bg-transparent text-right text-slate-700 focus:outline-none"
@@ -79,11 +87,19 @@ const ViewBox = () => {
               <option key={category}>{category}</option>
             ))}
           </select>
-          <span className="pointer-events-none absolute right-4 text-base text-emerald-500">▾</span>
+          <svg
+            className="pointer-events-none absolute right-4 h-4 w-4 text-emerald-500"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden
+          >
+            <path d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.585l3.71-3.354a.75.75 0 1 1 1.02 1.1l-4.22 3.82a.75.75 0 0 1-1.02 0l-4.22-3.82a.75.75 0 0 1 .02-1.1Z" />
+          </svg>
         </label>
       </form>
 
-      <div className="mt-10 flex flex-col items-center justify-center rounded-2xl bg-emerald-50/70 p-8 text-center shadow-inner">
+      <div className="mt-10 flex flex-col items-center justify-center rounded-2xl bg-emerald-50 p-8 text-center shadow-inner">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
