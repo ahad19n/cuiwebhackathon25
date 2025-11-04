@@ -1,16 +1,18 @@
-const dotenv = require("dotenv");
 const express = require("express");
 const mongoose = require("mongoose");
 
-const { resp } = require('./helpers');
-const authRoutes = require("./routes/Auth.routes");
-const errorHandler = require("./middleware/ErrorHandler.middleware");
+const handlerError = require("./middlewares/HandlerError");
+const { resp, graceful, genSecret } = require('./helpers');
+
+const authRoutes = require("./routes/Auth");
 
 // -------------------------------------------------------------------------- //
 
-dotenv.config();
 const app = express();
 app.use(express.json());
+
+if (!process.env.JWT_SECRET)
+  process.env.JWT_SECRET = genSecret(32);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("[INFO] MongoDB connected"))
@@ -28,10 +30,13 @@ app.use((req, res) => {
   resp(res, 404, "Route not found");
 })
 
-app.use(errorHandler);
+app.use(handlerError);
 
 // -------------------------------------------------------------------------- //
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`[INFO] Server listening on port ${process.env.PORT || 3000}`)
 });
+
+process.on('SIGINT', () => graceful(app, server));
+process.on('SIGTERM', () => graceful(app, server));
