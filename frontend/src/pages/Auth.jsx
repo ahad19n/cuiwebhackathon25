@@ -1,8 +1,38 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { Info, Sprout, BarChart2, CloudSun, MessageCircle } from "lucide-react";
+import api from "../api/api";
 
 function Auth() {
   const [tab, setTab] = useState("signin");
+
+  // React Hook Form for Sign In
+  const {
+    register: registerSignIn,
+    handleSubmit: handleSubmitSignIn,
+    formState: { errors: errorsSignIn },
+  } = useForm();
+
+  // React Hook Form for Sign Up
+  const {
+    register: registerSignUp,
+    handleSubmit: handleSubmitSignUp,
+    formState: { errors: errorsSignUp },
+  } = useForm();
+
+  const onSignInSubmit = async (data) => {
+    console.log("Sign In Data:", data);
+    // TODO: Call your sign-in API or authentication logic here
+    const res = await api.login(payload);
+  };
+
+  const onSignUpSubmit = async (data) => {
+    console.log("Sign Up Data:", data);
+    // Transform role to lowercase before sending to backend
+    const transformedData = { ...data, role: data.role.toLowerCase() };
+    const res = await api.signUp(transformedData);
+    console.log("Sign Up Response:", res);
+  };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100 p-6">
@@ -98,7 +128,10 @@ function Auth() {
 
           {/* Auth Forms */}
           {tab === "signin" ? (
-            <form className="space-y-4">
+            <form
+              onSubmit={handleSubmitSignIn(onSignInSubmit)}
+              className="space-y-4"
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Email
@@ -107,7 +140,19 @@ function Auth() {
                   type="email"
                   placeholder="your.email@example.com"
                   className="mt-1 w-full bg-gray-100 border rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                  {...registerSignIn("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    },
+                  })}
                 />
+                {errorsSignIn.email && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errorsSignIn.email.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -117,7 +162,19 @@ function Auth() {
                   type="password"
                   placeholder="••••••••"
                   className="mt-1 w-full border bg-gray-100 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                  {...registerSignIn("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters",
+                    },
+                  })}
                 />
+                {errorsSignIn.password && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errorsSignIn.password.message}
+                  </p>
+                )}
               </div>
               <button
                 type="submit"
@@ -127,7 +184,10 @@ function Auth() {
               </button>
             </form>
           ) : (
-            <form className="space-y-4">
+            <form
+              onSubmit={handleSubmitSignUp(onSignUpSubmit)}
+              className="space-y-4"
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700 ">
                   Full Name
@@ -136,16 +196,38 @@ function Auth() {
                   type="text"
                   placeholder="Ali Khan"
                   className="mt-1 w-full border bg-gray-100 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                  {...registerSignUp("name", {
+                    required: "Full name is required",
+                    minLength: {
+                      value: 2,
+                      message: "Name must be at least 2 characters",
+                    },
+                  })}
                 />
+                {errorsSignUp.name && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errorsSignUp.name.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Role
                 </label>
-                <select className="mt-1 w-full border bg-gray-100 rounded-md p-2 focus:ring-green-600 focus:border-green-600">
-                  <option>Farmer</option>
-                  <option>Admin</option>
+                <select
+                  className="mt-1 w-full border bg-gray-100 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                  {...registerSignUp("role", {
+                    required: "Role is required",
+                  })}
+                >
+                  <option value="Farmer">Farmer</option>
+                  <option value="Admin">Admin</option>
                 </select>
+                {errorsSignUp.role && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errorsSignUp.role.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -155,7 +237,19 @@ function Auth() {
                   type="email"
                   placeholder="your.email@example.com"
                   className="mt-1 w-full border rounded-md p-2 bg-gray-100 focus:ring-green-600 focus:border-green-600"
+                  {...registerSignUp("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    },
+                  })}
                 />
+                {errorsSignUp.email && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errorsSignUp.email.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -165,7 +259,19 @@ function Auth() {
                   type="password"
                   placeholder="Create a strong password"
                   className="mt-1 w-full border rounded-md p-2 bg-gray-100 focus:ring-green-600 focus:border-green-600"
+                  {...registerSignUp("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters",
+                    },
+                  })}
                 />
+                {errorsSignUp.password && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errorsSignUp.password.message}
+                  </p>
+                )}
               </div>
               <button
                 type="submit"
