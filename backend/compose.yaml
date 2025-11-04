@@ -2,6 +2,8 @@ services:
   mongo:
     image: mongo
     restart: unless-stopped
+    ports:
+      - 27017:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: dev
       MONGO_INITDB_ROOT_PASSWORD: dev
@@ -14,4 +16,3 @@ services:
     environment:
       ME_CONFIG_BASICAUTH: false
       ME_CONFIG_MONGODB_URL: mongodb://dev:dev@mongo
-  
