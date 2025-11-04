@@ -1,0 +1,5 @@
+{
+  "ext": "*",
+  "watch": ["."],
+  "exec": "docker compose up --build --detach && docker compose logs --follow backend"
+}

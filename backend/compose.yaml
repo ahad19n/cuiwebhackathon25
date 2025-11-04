@@ -8,6 +8,14 @@ services:
       MONGO_INITDB_ROOT_USERNAME: dev
       MONGO_INITDB_ROOT_PASSWORD: dev
 
+  backend:
+    build: .
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    environment:
+      MONGO_URI: mongodb://dev:dev@localhost
+
   mongo-express:
     image: mongo-express
     restart: unless-stopped
