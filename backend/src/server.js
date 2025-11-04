@@ -11,7 +11,10 @@ const ratesRoutes = require("./routes/Rates");
 // -------------------------------------------------------------------------- //
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", // 👈 explicit origin instead of "*"
+  credentials: true,               // 👈 allow cookies / Authorization headers
+}));
 app.use(express.json());
 
 if (!process.env.JWT_SECRET)
