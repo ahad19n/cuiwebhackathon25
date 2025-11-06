@@ -106,7 +106,7 @@ const SmartAdvice = () => {
 
       {/* AI Advice Section */}
       {loading && !aiAdvice && (
-        <div className="mb-6 rounded-2xl bg-gradient-to-r from-emerald-50 to-blue-50 p-6 border border-emerald-200">
+        <div className="mb-6 rounded-2xl bg-linear-to-r from-emerald-50 to-blue-50 p-6 border border-emerald-200">
           <div className="flex items-center gap-3">
             <Sparkles className="h-6 w-6 text-emerald-600 animate-pulse" />
             <p className="text-slate-700">Generating personalized advice...</p>
@@ -142,9 +142,9 @@ const SmartAdvice = () => {
       )}
 
       {aiAdvice && (
-        <div className="mb-6 rounded-2xl bg-gradient-to-r from-emerald-50 to-blue-50 p-6 border border-emerald-200 shadow-sm">
+        <div className="mb-6 rounded-2xl bg-linear-to-r from-emerald-50 to-blue-50 p-6 border border-emerald-200 shadow-sm">
           <div className="flex items-start gap-3 mb-3">
-            <Sparkles className="h-6 w-6 text-emerald-600 flex-shrink-0 mt-1" />
+            <Sparkles className="h-6 w-6 text-emerald-600 shrink-0 mt-1" />
             <div>
               <h3 className="text-lg font-semibold text-slate-800 mb-2">
                 AI-Powered Recommendations
